@@ -1,5 +1,5 @@
 {
-  "app": "dotnet run --project src/TodoApp/TodoApp.csproj",
+  "app": "dotnet run --project src/TodoApp.Infrastructure/TodoApp.Infrastructure.csproj",
   "watch": {
     "include": [
       "**"
