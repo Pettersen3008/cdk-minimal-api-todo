@@ -6,6 +6,7 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// boilerplate code, can we clean this up?
 builder.Host.ConfigureServices((_, services) =>
 {
     if (!builder.Environment.IsDevelopment())
@@ -28,7 +29,6 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Apply migrations at startup
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -46,7 +46,7 @@ app.UseHttpsRedirection();
 
 app.MapGet("/", () => Results.Ok("Hello from Todo API!")).WithName("HealthCheck");
 
-// Todo endpoints
+// Refactor this to different folder
 app.MapGet("/todos", async (AppDbContext db) => await db.Todos.ToListAsync());
 
 app.MapGet("/todos/{id}", async (int id, AppDbContext db) =>

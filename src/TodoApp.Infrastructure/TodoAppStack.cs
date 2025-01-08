@@ -13,37 +13,32 @@ namespace TodoApp
     {
         internal TodoAppStack(Construct scope, string id, IStackProps props = null) : base(scope, id, props)
         {
-            // Create VPC
             var vpc = new Vpc(this, "TodoAppVpc", new VpcProps
             {
                 MaxAzs = 2,
                 NatGateways = 1
             });
-
-            // Create Security Group for RDS
+            
             var dbSecurityGroup = new SecurityGroup(this, "DatabaseSecurityGroup", new SecurityGroupProps
             {
                 Vpc = vpc,
                 Description = "Security group for RDS instance",
                 AllowAllOutbound = true
             });
-
-            // Create Security Group for Lambda
+            
             var lambdaSecurityGroup = new SecurityGroup(this, "LambdaSecurityGroup", new SecurityGroupProps
             {
                 Vpc = vpc,
                 Description = "Security group for Lambda function",
                 AllowAllOutbound = true
             });
-
-            // Allow Lambda to access RDS
+            
             dbSecurityGroup.AddIngressRule(
                 lambdaSecurityGroup,
                 Port.Tcp(5432),
                 "Allow Lambda to access PostgreSQL"
             );
-
-            // Create RDS Instance
+            
             var rdsInstance = new DatabaseInstance(this, "TodoDatabase", new DatabaseInstanceProps
             {
                 Engine = DatabaseInstanceEngine.Postgres(new PostgresInstanceEngineProps
@@ -57,11 +52,10 @@ namespace TodoApp
                 DatabaseName = "tododb",
                 MaxAllocatedStorage = 20,
                 AllocatedStorage = 20,
-                RemovalPolicy = RemovalPolicy.DESTROY, // Note: Use RETAIN in production
-                DeletionProtection = false // Note: Enable in production
+                RemovalPolicy = RemovalPolicy.DESTROY, // Change this when production
+                DeletionProtection = false // Change this when production
             });
-
-            // Create Lambda Function
+            
             var lambdaFunction = new Function(this, "TodoApiHandler", new FunctionProps
             {
                 Runtime = Runtime.DOTNET_8,
@@ -72,11 +66,12 @@ namespace TodoApp
                 Architecture = Architecture.ARM_64,
                 Environment = new Dictionary<string, string>
                 {
-                    ["POSTGRES_HOST"] = rdsInstance.InstanceEndpoint.Hostname,
-                    ["POSTGRES_PORT"] = "5432",
-                    ["POSTGRES_DB"] = "tododb",
-                    ["POSTGRES_USER"] = rdsInstance.Secret?.SecretValueFromJson("username").UnsafeUnwrap() ?? "",
-                    ["POSTGRES_PASSWORD"] = rdsInstance.Secret?.SecretValueFromJson("password").UnsafeUnwrap() ?? "",
+                    // Since i have the connection string i dont need to pass the individual values (i'am no sure but we can test it)
+                    // ["POSTGRES_HOST"] = rdsInstance.InstanceEndpoint.Hostname,
+                    // ["POSTGRES_PORT"] = "5432",
+                    // ["POSTGRES_DB"] = "tododb",
+                    // ["POSTGRES_USER"] = rdsInstance.Secret?.SecretValueFromJson("username").UnsafeUnwrap() ?? "",
+                    // ["POSTGRES_PASSWORD"] = rdsInstance.Secret?.SecretValueFromJson("password").UnsafeUnwrap() ?? "",
                     ["DB_CONNECTION_STRING"] = $"Host={rdsInstance.InstanceEndpoint.Hostname};Port=5432;Database=tododb;User ID={rdsInstance.Secret?.SecretValueFromJson("username").UnsafeUnwrap()};Password={rdsInstance.Secret?.SecretValueFromJson("password").UnsafeUnwrap()};Pooling=true;",
                     ["ASPNETCORE_ENVIRONMENT"] = "Production",
                     ["AWS_LAMBDA_ASPNETCORE_HOSTBUILDER_BUILDER_KEY"] = "1"
@@ -86,10 +81,9 @@ namespace TodoApp
                 SecurityGroups = new[] { lambdaSecurityGroup }
             });
             
-            // Grant Lambda access to read RDS secret
             rdsInstance.Secret?.GrantRead(lambdaFunction);
 
-            var api = new LambdaRestApi(this, "TodoApi", new LambdaRestApiProps
+            _ = new LambdaRestApi(this, "TodoApi", new LambdaRestApiProps
             {
                 Handler = lambdaFunction,
                 Proxy = true,
