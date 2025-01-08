@@ -23,6 +23,26 @@ npm install -g aws-cdk
 
 Next, you will need to the .NET Core SDK. You can download the SDK [here](https://dotnet.microsoft.com/download).
 
+And finally, you will need to install Docker. You can download Docker [here](https://www.docker.com/products/docker-desktop).
+
+## Running the project
+
+The project can be run both localhost and be deployed to AWS. To run the project locally, you can use the following command:
+
+```bash
+docker-compose up -d
+```
+This will spin up a postgres database and a pgAdmin instance. You can access pgAdmin by navigating to `localhost:5050` in your browser. The default username is `postgres@postgres.com` and the default password is `postgres`.
+
+Then you can run the following command to start the project:
+
+```bash
+dotnet run --project src/TodoApp.Api
+```
+
+To deploy the project to AWS, you can use the following command:
+
+```bash
 Once you have the CDK CLI and the .NET Core SDK installed, you can run the following commands to deploy the stack:
 
 ```bash
@@ -40,3 +60,6 @@ chmod +x deploy.sh
 ```
 
 This will build the project and deploy the stack to your AWS account.
+
+
+To check if everything is working as expected, you can go to our API Gateway URL / Localhost url and check if you can access the API at <a href="http://localhost:5257/scalar/v1">http://localhost:5257/scalar/v1</a>.
