@@ -25,7 +25,7 @@ public static class Configuration
                 );
             }
         });
-        builder.Services.AddSingleton<ITodoService, TodoService>();
+        builder.Services.AddScoped<ITodoService, TodoService>();
         builder.Services
             .AddEndpointsApiExplorer()
             .AddSwaggerGen();
