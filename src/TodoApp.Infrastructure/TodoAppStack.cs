@@ -60,18 +60,12 @@ namespace TodoApp
             {
                 Runtime = Runtime.DOTNET_8,
                 Handler = "TodoApp.Api",
-                Code = Code.FromAsset("./src/pubapi"),
+                Code = Code.FromAsset("./src/TodoApp.Api/bin/Release/net8.0/linux-arm64/publish/"),
                 MemorySize = 1024,
                 Timeout = Duration.Seconds(60),
                 Architecture = Architecture.ARM_64,
                 Environment = new Dictionary<string, string>
                 {
-                    // Since i have the connection string i dont need to pass the individual values (i'am no sure but we can test it)
-                    // ["POSTGRES_HOST"] = rdsInstance.InstanceEndpoint.Hostname,
-                    // ["POSTGRES_PORT"] = "5432",
-                    // ["POSTGRES_DB"] = "tododb",
-                    // ["POSTGRES_USER"] = rdsInstance.Secret?.SecretValueFromJson("username").UnsafeUnwrap() ?? "",
-                    // ["POSTGRES_PASSWORD"] = rdsInstance.Secret?.SecretValueFromJson("password").UnsafeUnwrap() ?? "",
                     ["DB_CONNECTION_STRING"] = $"Host={rdsInstance.InstanceEndpoint.Hostname};Port=5432;Database=tododb;User ID={rdsInstance.Secret?.SecretValueFromJson("username").UnsafeUnwrap()};Password={rdsInstance.Secret?.SecretValueFromJson("password").UnsafeUnwrap()};Pooling=true;",
                     ["ASPNETCORE_ENVIRONMENT"] = "Production",
                     ["AWS_LAMBDA_ASPNETCORE_HOSTBUILDER_BUILDER_KEY"] = "1"

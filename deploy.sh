@@ -1,8 +1,6 @@
-echo $GITHUB_REF_NAME
-
 cd src 
 cd TodoApp.Api
-dotnet publish --configuration Release -o ../pubapi --runtime linux-arm64 --framework net8.0
+dotnet publish --configuration Release --runtime linux-arm64 --framework net8.0
 cd ..
 
 exitCode=$?
